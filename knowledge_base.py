@@ -111,9 +111,30 @@ authors_pulp = {
         'Cornell Woolrich',
         'Gordon Young',
     ],
+    # Based on 'Similar to Charles Dickens'
     'low':
     [
-
+        'Charles Dickens',
+        'George Eliot',
+        'Wilkie Collins',
+        'George Grossmith',
+        'Hans Christian Andersen',
+        'Anthony Trollope',
+        'Henry Fielding',
+        'Joseph Conrad',
+        'Henry James',
+        'Alexandre Dumas',
+        'Gustave Flaubert',
+        'Walter Scott',
+        'Geoffrey Chaucer',
+        'O. Henry',
+        'Robert Tressell',
+        'Thomas Hardy',
+        'Henry van Dyke',
+        'E.M. Forster',
+        'Elizabeth Gaskell',
+        'R.D. Blackmore',
+        'George Gissing',
     ]
 }
 
@@ -138,6 +159,6 @@ genres_pulp = {
     ],
     'low':
     [
-
+        
     ]
 }
