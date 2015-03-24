@@ -1,4 +1,8 @@
 ## Project to heuristically fix ebook
+
+### Notes:
+* Consider using fuzzy logic for the paragraph breaks, with a fuzzy break-level-input
+
 ### Breaks:
 * Dialogue
 * Skipping to a new time (keywords)
