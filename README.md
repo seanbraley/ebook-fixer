@@ -12,12 +12,12 @@
 
 ### Fuzzy Paragraphing System
 1. First will decide the 'Pulpiness' of the book, that is the number of paragraph breaks
-    a. Will do this by Author, Genre, and textual analysis (weighted)
-    b. NOTE: Could use input on Author and Genres list. Would like to expand into HIGH MED LOW categories
+    1. Will do this by Author, Genre, and textual analysis (weighted)
+    2. NOTE: Could use input on Author and Genres list. Would like to expand into HIGH MED LOW categories
 2. Second will iterate through sentences (Found with Regex)
-    a. Using a s_norm t_norm pair will decide if there should be a paragraph break
-    b. (cond1 OR cond2 OR .. condN) AND pulpiness
-    c. Deffuzification is 0 if < 5; 1 if >= 5
+    1. Using a s_norm t_norm pair will decide if there should be a paragraph break
+    2. (cond1 OR cond2 OR .. condN) AND pulpiness
+    3. Deffuzification is 0 if < 5; 1 if >= 5
 3. Will create an internal text string with all the sentences patched together with line breaks put in.
 
 #### Breaks used:
