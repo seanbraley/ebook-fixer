@@ -13,6 +13,7 @@ class Book(object):
         self.author = author
         self.genre = genre
         self.text = text
+        self.corrected_text = ""
         self.paragraphs = []
 
         # A value in the range [0..1]
@@ -24,34 +25,59 @@ class Book(object):
     def t_norm(self, x, y, *args):
         if args:
             return self.t_norm(
-                self.t_norm(x,y),
+                self.t_norm(x, y),
                 args[0],
                 *args[1:]
             )
-        return min(x, y)
-            #min(1, x+y)
+        return x*y
+
+    def s_norm(self, x, y, *args):
+        if args:
+            return self.s_norm(
+                self.s_norm(x, y),
+                args[0],
+                *args[1:]
+            )
+        return max(x, y)
 
     def format(self):
         if self.pulp_value is None:
             self.estimate_pulpiness_fuzzy()
 
         # Textual Indicators
-        speaking = (1.0, r'\"(.+?)\"')
-        charchange1 = (0.5, r'(A )')
-        charchange2 = (0.5, r'(The )')
-
-
+        speaking = r'\"(.+?)\"'
         sentence = r'(.+?)(\.\s|\!\s|\?\s|\.\"\s|\?\"\s)'
         sentences = re.findall(sentence, self.text)
-
+        length = 1
         for sentence in sentences:
-            is_speaking = 1.0 if re.match(speaking[1], sentence[0]) else 0
-            charchange = .5 if sentence.startswith('A', 'The') else 0
-            timechange = .5 if sentence.startswith('Once', 'Later', 'This afternoon', 'Tonight', "Tomorrow",
-                                                    'Soon', 'Afterwards') else 0
-            placechange = .5 if sentence.startswith('Across', 'Over', 'Under', 'Behind', 'Around', 'Near') else 0
+            is_speaking = 1.0 if re.match(speaking, sentence[0]) else 0
+            charchange = .7 if sentence[0].startswith(('A', 'The')) else 0
+            timechange = .7 if sentence[0].startswith(('Once', 'Later', 'This afternoon', 'Tonight', "Tomorrow",
+                                                       'Soon', 'Afterwards')) else 0
+            placechange = .7 if sentence[0].startswith(('Across', 'Over', 'Under', 'Behind', 'Around', 'Near')) else 0
 
+            do_break = self.s_norm(is_speaking, charchange, timechange, placechange, length/10.0)
 
+            conversion_dict = {
+                "VERY HIGH": 0.9,
+                "HIGH": 0.7,
+                "MEDIUM": 0.5,
+                "LOW": 0.3,
+                "VERY LOW": 0.1,
+            }
+
+            new_break = self.t_norm(do_break, conversion_dict[self.pulp_value])
+
+            # print "Values: {0}, {1}, {2}".format(new_break, do_break, conversion_dict[self.pulp_value])
+            self.corrected_text += sentence[0]
+            if do_break >= 0.5:
+                self.corrected_text += "\n"
+                length = 1
+            else:
+                self.corrected_text += " "
+                length += 1
+
+            print(self.corrected_text[2000:3000])
 
     def estimate_pulpiness_fuzzy(self):
         '''Sets the value for pulpiness based on the auther, genre and text content'''

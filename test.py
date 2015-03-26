@@ -296,6 +296,7 @@ ALVAREZ LEGIRA stopped at the door of Cabin A. This was the only spot of the shi
 
 theShadowBook = Book('The Shadow', 'Walter B. Gibson', 'Mystery;Adventure', text)
 theShadowBook.estimate_pulpiness_fuzzy()
+theShadowBook.format()
 
 # Match sets of quotations
 # http://stackoverflow.com/questions/9519734/python-regex-to-find-a-string-in-double-quotes-within-a-string
