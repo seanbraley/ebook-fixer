@@ -292,11 +292,95 @@ ALVAREZ LEGIRA stopped at the door of Cabin A. This was the only spot of the shi
 "Suppose that you should have the money," said The Shadow, quietly, "would you divide it with Zelva if he came to keep the meeting?" "I have so agreed," stated Legira. "I shall abide by my promise." The Shadow silently studied his man. Then, he spoke in a low, emphatic tone. "Pesano and I did business together," he remarked. "Your strong room is very strong--yet not so strong. We had time to do our work. Those bags beside you--" Legira noted the bags in the nearest corner of the room. They were large, heavy traveling bags. "Open them." Legira obeyed The Shadow's order. An amazed, incredulous cry came from his lips. Within the bags lay the wealth that Legira had obtained in New York! Gold certificates, securities--the entire ten million-- all there! Legira realized with amazing suddenness that The Shadow, aided by Pesano, had done this work. Here, on the Cordova, Legira was sailing free from every obstacle, carrying the funds to Santander! "But Zelva!" Legira's exclamation was spontaneous. "He has the box - the box--it contains nothing?" "The box contains something," said The Shadow quietly. "Remember your promise, Legira. If Zelva comes with that box--unopened--you must give him his share. But do not let any one open the box. You will receive word from me what to do with it." Legira was looking at the money, an expression of profound delight upon his face. Then something of The Shadow's last statement impressed him. He looked up. The man in black had left the cabin! LEGIRA was thinking of the box that contained the wealth for Santander. The Shadow had opened that box, as well as the strong room. What did the box contain?--Legira wondered. In this, he was not alone. Another man was wondering about the contents of the box. Rodriguez Zelva, in a locked cabin of the rumrunner, had the box before him. He had opened the box when he had first captured it; then had closed it for deposit in the strong room. Now, alone, he had forgotten his promise to The Shadow. Forgotten it by design. Zelva, confident that no one could have tampered with the box, was, nevertheless, eager to see his illy-acquired gains. He produced the key--which he had taken from Legira--and undid the fastenings of the box. He spoke aloud as he placed his hands upon the lid. "The fool!" he exclaimed. "The fool! The one who thinks himself so brave, yet is a fool!" He was speaking of The Shadow. The dread specter of the man in black had faded from Zelva's mind, now that he was away from the menace. Rodriguez Zelva no longer feared the hand of The Shadow. With eager hands, Zelva raised the lid of the metal-bound box. He saw a greenish color which seemed to spread itself across the top of the box. Zelva leaned forward. Wreathing its way upward came a slimy, greenish vapor, that spread itself like a ghoulish monster from another world. The ghostly shape spread into a formless mass that writhed itself about the man who was staring into the box.
 
 With a horrible scream, Zelva leaped away. His scream became a choking gasp. The room was filled with the spreading gas. Greenish specks were dancing. Zelva, coughing, clawed at his eyes. He tried to stop his mouth. He tottered toward the door, then fell, a huddled figure amid the whirling vapor that pervaded the entire room. Within the box rested the container that had held the poison gas. By raising the lid, Zelva had released the deadly vapor, placed there by The Shadow. Death had gripped Rodriguez Zelva. It was not death by The Shadow's design; it was death of Zelva's own making. Had Rodriguez Zelva kept his promise no harm would have befallen him. But in defiance of The Shadow, he had played the traitor to the last. This master mind of international crime had gone to the fate that he deserved. MILES away, the yacht Cordova came to a stop amid the calm sea. Alvarez Legira, wondering, went to the bridge. He spoke to the captain, in Spanish. "Why are we stopping here?" "You told me to have the little motor boat put over the side, sir," the captain declared. "That was after you told me just where we were to heave to--" The purring of a motor sounded from the water off the lee side of the ship. Alvarez Legira stared in that direction. The captain followed his example. The motor boat of the Cordova was speeding through the waters of Delaware Bay, heading for the mouth of the river. Beneath the glow of the moon, its shape was plain. Standing in the center of the boat was a figure that appeared phantomlike in the mystic glow. It was The Shadow! A weird, creepy laugh floated across the water. A strange, fantastic laugh it was--a laugh that would never be forgotten by those who heard it from the Cordova. The tones of that laugh were chilling. They formed mockery that seemed voiced from another world. It was the laugh of The Shadow. THE END
-""".strip("\n")
+"""
 
-theShadowBook = Book('The Shadow', 'Walter B. Gibson', 'Mystery;Adventure', text)
+from nltk import word_tokenize
+import nltk
+
+from models import average
+
+# Load up PUNKT sentence detector (this works well)
+sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+
+# rawShadowText = word_tokenize(text)
+print("======SHADOW TEXT======")
+print("\n-----\n").join(sent_detector.tokenize(text.strip()))
+print("=====/SHADOW TEXT======")
+
+theShadowBook = Book('The Shadow', 'Walter B. Gibson', 'Mystery;Adventure', sent_detector.tokenize(text.strip()))
 theShadowBook.estimate_pulpiness_fuzzy()
-theShadowBook.format()
+emma = nltk.corpus.gutenberg.sents('austen-emma.txt')
+
+emma_paras = nltk.corpus.gutenberg.paras('austen-emma.txt')
+para_lengths = [len(x) for x in emma_paras]
+print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
+                                                                                     max(para_lengths),
+                                                                                     min(para_lengths)))
+
+
+moby_paras = nltk.corpus.gutenberg.paras('melville-moby_dick.txt')
+para_lengths = [len(x) for x in moby_paras]
+print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
+                                                                                     max(para_lengths),
+                                                                                     min(para_lengths)))
+
+# print("Number of sentences{0}".format(emma.count('\n')))
+
+theAustenBook = Book('Emma', 'Jane Austen', 'Novel of manners', nltk.corpus.gutenberg.sents('austen-emma.txt'))
+theAustenBook.estimate_pulpiness_fuzzy()
+
+theMobyDickBook = Book('Moby Dick', 'Melville', 'Adventure', nltk.corpus.gutenberg.sents('melville-moby_dick.txt'))
+theMobyDickBook.estimate_pulpiness_fuzzy()
+
+# theShadowBook.format()
+
+# print "Number of newlines in shadow book: {0}".format(theShadowBook.corrected_text.count("\n"))
+
+
+'''
+import nltk
+
+emma = nltk.corpus.gutenberg.raw('austen-emma.txt')
+
+emma_stripped_text = emma.replace("\n", "")
+
+theAustenBook = Book('Emma', 'Jane Austen', 'Novel of manners', emma_stripped_text)
+theAustenBook.estimate_pulpiness_fuzzy()
+theAustenBook.format()
+
+print "Number of Newlines in Emma: \nOriginal: {0}; Formatted {1}".format(emma.count("\n"), theAustenBook.corrected_text.count("\n"))
+
+
+moby_dick = nltk.corpus.gutenberg.raw('melville-moby_dick.txt')
+
+import codecs
+
+with codecs.open('outputfile2.txt', 'w', 'utf-8') as output:
+    output.write(moby_dick)
+
+moby_dick_stripped_text = moby_dick.replace("\n", "")
+theMobyDickBook = Book('Moby Dick', 'Melville', 'Adventure', moby_dick_stripped_text)
+theMobyDickBook.estimate_pulpiness_fuzzy()
+theMobyDickBook.format()
+
+# WHY ARE THESE NOT THE SAME LENGTH?
+# WHY IS THIS NOT REMOVING THEM???
+
+print len(moby_dick), moby_dick.count("\n")
+
+
+print "Number of Newlines in Moby Dick: \nOriginal: {0}; Formatted {1}".format(moby_dick.count("\n"), theMobyDickBook.corrected_text.count("\n"))
+with codecs.open('outputfile.txt', 'w', 'utf-8') as output:
+    output.write(theMobyDickBook.corrected_text)
+
+sentence = r'(.+?)(\.\s|\!\s|\?\s|\.\"\s|\?\"\s)'
+sentences = re.findall(sentence, moby_dick)
+
+#for sentence in sentences:
+    #print sentence[0]
+    #print sentence[0].split(" ")[0]
+
+
 
 # Match sets of quotations
 # http://stackoverflow.com/questions/9519734/python-regex-to-find-a-string-in-double-quotes-within-a-string
@@ -332,3 +416,4 @@ for sen in sentences:
 
     # print "Rating: %0.1f" % rating, sen[0] + sen[1]
 
+'''

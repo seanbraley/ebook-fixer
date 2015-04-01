@@ -110,6 +110,7 @@ authors_pulp = {
         'Tennessee Williams',
         'Cornell Woolrich',
         'Gordon Young',
+        # Clark austin smith
     ],
     # Based on 'Similar to Charles Dickens'
     'low':
@@ -161,4 +162,65 @@ genres_pulp = {
     [
         
     ]
+}
+
+transition_words = {
+    'adverbs':
+    (
+        'Accordingly',
+        'Also',
+        'Anyway ',
+        'Besides',
+        'Certainly',
+        'Consequently',
+        'Finally',
+        'Furthermore',
+        'Hence',
+        'However',
+        'Incidentally',
+        'Indeed',
+        'Instead',
+        'Likewise',
+        'Meanwhile',
+        'Moreover',
+        'Nevertheless',
+        'Next',
+        'Nonetheless',
+        'Now',
+        'Otherwise',
+        'Similarly',
+        'Stil',
+        'then',
+        'Thereafter',
+        'Therefore',
+        'Thus',
+        'Undoubtedly',
+        # Added SBraley March 29th
+
+
+    ),
+    'phrases':
+    (
+        'In addition',
+        'In contrast',
+        'For example',
+        'For instance',
+        'Of course',
+        'As a result',
+        'In other words',
+    ),
+    'implied':
+    (
+        'These',
+    ),
+    'custom':
+    (
+        'During',
+        'Even',
+        'Then',
+        'In',
+        'Of',
+        'As',
+
+    )
 }
