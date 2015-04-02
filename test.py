@@ -309,28 +309,122 @@ print("=====/SHADOW TEXT======")
 
 theShadowBook = Book('The Shadow', 'Walter B. Gibson', 'Mystery;Adventure', sent_detector.tokenize(text.strip()))
 theShadowBook.estimate_pulpiness_fuzzy()
+
+# Keneth Robeson book:
+print("\nDoc Savage: ")
+
+with open('Doc Savage - 001 - The Man of Bronze(1933)(Dent, Lester).txt', 'rb') as file:
+    fileText = file.read()
+
+fileText = fileText.replace("\n", "")
+fileText = fileText.split("\r")
+
+while '' in fileText:
+    fileText.remove('')
+
+para_lengths = []
+sentences_complete = []
+for paragraph in fileText:
+    sentences = sent_detector.tokenize(paragraph.strip())
+    para_lengths.append(len(sentences))
+    sentences_complete.extend(sentences)
+
+docSavageFirst = Book('Doc Savage - 001 The Man of Bronze', 'Keneth Robeson', 'mystery;adventure', sentences_complete)
+docSavageFirst.estimate_pulpiness_fuzzy()
+
+
+print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
+                                                                                      max(para_lengths),
+                                                                                      min(para_lengths)))
+
+print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
+                                                                          len(para_lengths)))
+
+# Keneth Robeson book:
+print("\nDoc Savage 13: ")
+
+with open('Doc Savage - 013 - Land of Always-Night(1935)(Dent, Lester).txt', 'rb') as file:
+    fileText = file.read()
+
+fileText = fileText.replace("\n", "")
+fileText = fileText.split("\r")
+
+while '' in fileText:
+    fileText.remove('')
+
+para_lengths = []
+sentences_complete = []
+for paragraph in fileText:
+    sentences = sent_detector.tokenize(paragraph.strip())
+    para_lengths.append(len(sentences))
+    sentences_complete.extend(sentences)
+
+docSavageSecond = Book('Doc Savage - 013 Land of Always-Night', 'Keneth Robeson', 'mystery;adventure', sentences_complete)
+docSavageSecond.estimate_pulpiness_fuzzy()
+
+
+print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
+                                                                                      max(para_lengths),
+                                                                                      min(para_lengths)))
+
+print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
+                                                                          len(para_lengths)))
+
+# print("\n-----\n").join(sent_detector.tokenize(fileText))
+
+
+# print("Number of sentences{0}".format(emma.count('\n')))
+
+print("\nEmma: ")
+
 emma = nltk.corpus.gutenberg.sents('austen-emma.txt')
 
 emma_paras = nltk.corpus.gutenberg.paras('austen-emma.txt')
 para_lengths = [len(x) for x in emma_paras]
-print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
-                                                                                     max(para_lengths),
-                                                                                     min(para_lengths)))
 
-
-moby_paras = nltk.corpus.gutenberg.paras('melville-moby_dick.txt')
-para_lengths = [len(x) for x in moby_paras]
-print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
-                                                                                     max(para_lengths),
-                                                                                     min(para_lengths)))
-
-# print("Number of sentences{0}".format(emma.count('\n')))
 
 theAustenBook = Book('Emma', 'Jane Austen', 'Novel of manners', nltk.corpus.gutenberg.sents('austen-emma.txt'))
 theAustenBook.estimate_pulpiness_fuzzy()
 
+print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
+                                                                                      max(para_lengths),
+                                                                                      min(para_lengths)))
+
+print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
+                                                                          len(para_lengths)))
+
+
+print("\nMoby Dick: ")
+
+moby_paras = nltk.corpus.gutenberg.paras('melville-moby_dick.txt')
+para_lengths = [len(x) for x in moby_paras]
+
 theMobyDickBook = Book('Moby Dick', 'Melville', 'Adventure', nltk.corpus.gutenberg.sents('melville-moby_dick.txt'))
 theMobyDickBook.estimate_pulpiness_fuzzy()
+
+print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
+                                                                                      max(para_lengths),
+                                                                                      min(para_lengths)))
+
+print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
+                                                                          len(para_lengths)))
+
+# chesterton-brown
+print("Chesterton: ")
+
+brown_paras = nltk.corpus.gutenberg.paras('chesterton-brown.txt')
+para_lengths = [len(x) for x in brown_paras]
+
+theMobyDickBook = Book('The Wisdom of Father Brown', 'G. K. Chesterton', 'Mystery', nltk.corpus.gutenberg.sents('chesterton-brown.txt'))
+theMobyDickBook.estimate_pulpiness_fuzzy()
+
+print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
+                                                                                      max(para_lengths),
+                                                                                      min(para_lengths)))
+
+print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
+                                                                          len(para_lengths)))
+
 
 # theShadowBook.format()
 
