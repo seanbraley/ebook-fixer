@@ -307,6 +307,7 @@ print("======SHADOW TEXT======")
 print("\n-----\n").join(sent_detector.tokenize(text.strip()))
 print("=====/SHADOW TEXT======")
 
+print("\nShadow: ")
 theShadowBook = Book('The Shadow', 'Walter B. Gibson', 'Mystery;Adventure', sent_detector.tokenize(text.strip()))
 theShadowBook.estimate_pulpiness_fuzzy()
 
@@ -332,14 +333,14 @@ for paragraph in fileText:
 docSavageFirst = Book('Doc Savage - 001 The Man of Bronze', 'Keneth Robeson', 'mystery;adventure', sentences_complete)
 docSavageFirst.estimate_pulpiness_fuzzy()
 
-
+'''
 print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
                                                                                       max(para_lengths),
                                                                                       min(para_lengths)))
 
 print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
                                                                           len(para_lengths)))
-
+'''
 # Keneth Robeson book:
 print("\nDoc Savage 13: ")
 
@@ -362,13 +363,14 @@ for paragraph in fileText:
 docSavageSecond = Book('Doc Savage - 013 Land of Always-Night', 'Keneth Robeson', 'mystery;adventure', sentences_complete)
 docSavageSecond.estimate_pulpiness_fuzzy()
 
-
+'''
 print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
                                                                                       max(para_lengths),
                                                                                       min(para_lengths)))
 
 print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
                                                                           len(para_lengths)))
+'''
 
 # print("\n-----\n").join(sent_detector.tokenize(fileText))
 
@@ -376,16 +378,17 @@ print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_l
 # print("Number of sentences{0}".format(emma.count('\n')))
 
 print("\nEmma: ")
-
+'''
 emma = nltk.corpus.gutenberg.sents('austen-emma.txt')
 
 emma_paras = nltk.corpus.gutenberg.paras('austen-emma.txt')
 para_lengths = [len(x) for x in emma_paras]
-
+'''
 
 theAustenBook = Book('Emma', 'Jane Austen', 'Novel of manners', nltk.corpus.gutenberg.sents('austen-emma.txt'))
 theAustenBook.estimate_pulpiness_fuzzy()
 
+'''
 print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
                                                                                       max(para_lengths),
                                                                                       min(para_lengths)))
@@ -393,38 +396,44 @@ print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".f
 print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
                                                                           len(para_lengths)))
 
-
+'''
 print("\nMoby Dick: ")
 
+'''
 moby_paras = nltk.corpus.gutenberg.paras('melville-moby_dick.txt')
 para_lengths = [len(x) for x in moby_paras]
+'''
 
 theMobyDickBook = Book('Moby Dick', 'Melville', 'Adventure', nltk.corpus.gutenberg.sents('melville-moby_dick.txt'))
 theMobyDickBook.estimate_pulpiness_fuzzy()
 
+'''
 print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
                                                                                       max(para_lengths),
                                                                                       min(para_lengths)))
 
 print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
                                                                           len(para_lengths)))
+'''
 
 # chesterton-brown
-print("Chesterton: ")
-
+print("\nChesterton: ")
+'''
 brown_paras = nltk.corpus.gutenberg.paras('chesterton-brown.txt')
 para_lengths = [len(x) for x in brown_paras]
+'''
 
 theMobyDickBook = Book('The Wisdom of Father Brown', 'G. K. Chesterton', 'Mystery', nltk.corpus.gutenberg.sents('chesterton-brown.txt'))
 theMobyDickBook.estimate_pulpiness_fuzzy()
 
+'''
 print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
                                                                                       max(para_lengths),
                                                                                       min(para_lengths)))
 
 print("Number of 1-sentence paragraphs: {0} out of {1} paragraphs".format(para_lengths.count(1),
                                                                           len(para_lengths)))
-
+'''
 
 # theShadowBook.format()
 

@@ -59,13 +59,13 @@ class Book(object):
                 *args[1:]
             )
         # Goguen
-        return max(x, y)
+        # return max(x, y)
 
         # Zukasiewiez
         # return min(1, x+y)
 
         # Nilpotent
-        # return max(x, y) if (x + y > 1) else 1
+        return max(x, y) if (x + y > 1) else 1
 
     def format(self):
         if self.pulp_value is None:
@@ -87,34 +87,37 @@ class Book(object):
 
 
         """
+        subject = {}
         for sentence in self.sentences:
+            # Speaking (ALWAYS BREAK)
             is_speaking = 1.0 if re.match(speaking, sentence[0]) else 0
 
+            # Keyword, sometimes break
             if sentence[0].startswith(('A', 'The')):
-                change = .7
+                keyword = .7
             elif sentence[0].startswith(('Once', 'Later', 'This afternoon', 'Tonight', "Tomorrow", 'Soon', 'Afterwards')):
-                change = .7
+                keyword = .7
             elif sentence[0].startswith(('Across', 'Over', 'Under', 'Behind', 'Around', 'Near')):
-                change = .7
-            else:
-                change = .0
-            #charchange = .7 if sentence[0].startswith(('A', 'The')) else 0
-            #timechange = .7 if sentence[0].startswith(('Once', 'Later', 'This afternoon', 'Tonight', "Tomorrow",
-            #                                           'Soon', 'Afterwards')) else 0
-            #placechange = .7 if sentence[0].startswith(('Across', 'Over', 'Under', 'Behind', 'Around', 'Near')) else 0
-
-            if sentence[0].startswith(transition_words['adverbs']):
-                word_transition = 0.7
+                keyword = .7
+            elif sentence[0].startswith(transition_words['adverbs']):
+                keyword = 0.7
             elif sentence[0].startswith(transition_words['phrases']):
-                word_transition = 0.5
+                keyword = 0.5
             elif sentence[0].startswith(transition_words['implied']):
-                word_transition = 0.3
+                keyword = 0.3
+            elif sentence[0].startswith(transition_words['custom']):
+                keyword = 0.7
             else:
-                word_transition = 0.0
+                keyword = 0.0
 
-            custom = 0.7 if sentence[0].startswith(transition_words['custom']) else 0.0
+            # Context check (Add this)
+            # subject['subject'] = score
+            if subject[max(subject)] < 5:
+                context = .7
+            else:
+                context = .3
 
-            do_break = self.s_norm(is_speaking, change, word_transition, custom, sigmoid(length))
+            do_break = self.s_norm(is_speaking, keyword, context, sigmoid(length/5.0))
 
             conversion_dict = {
                 "VERY HIGH": 0.9,
@@ -127,16 +130,17 @@ class Book(object):
             new_break = self.t_norm(do_break, conversion_dict[self.pulp_value])
 
             # print "Values: {0}, {1}, {2}".format(new_break, do_break, conversion_dict[self.pulp_value])
-            self.corrected_text += sentence[0] + sentence[1]
             # print new_break
             if new_break >= 0.5:
                 self.corrected_text += "\n\n"
+                subject = {}
                 length = 1
             else:
-                self.corrected_text += " "
                 length += 1
-                # print "NOT BREAKING ON: " + sentence[0]
-            # print(self.corrected_text[2000:3000])
+
+            # Do line break before you add the sentence
+            self.corrected_text += sentence[0] + sentence[1]
+            self.corrected_text += " "
 
     def estimate_pulpiness_fuzzy(self):
         '''Sets the value for pulpiness based on the auther, genre and text content'''
@@ -196,18 +200,17 @@ class Book(object):
 
         smog_score = 1.0430 * math.sqrt(number_polysyllables * (30/float(len(sentence_lengths)))) + 3.1291
 
-        print("Stats: \nShortwords Percentage: {0:.2f}%; Average Word Length: {1:.2f} letters; "
-              "Average Sentence Length: {2:.2f} words; average syllable length: {3:.2f}"
-              .format(shortwords_percentage*100, average_word_length,
-                      average_sentence_length, average_sylco_length))
+        #print("Stats: \nShortwords Percentage: {0:.2f}%; Average Word Length: {1:.2f} letters; "
+        #      "Average Sentence Length: {2:.2f} words; average syllable length: {3:.2f}"
+        #      .format(shortwords_percentage*100, average_word_length,
+        #              average_sentence_length, average_sylco_length))
 
-        print("Reading tests: \nFlesh Reading Ease: {0}, Flesh Kincaid: {1}, SMOG: {2}".format(
-            flesh_score,
-            flesh_kincaid_score,
-            smog_score
-        ))
+        #print("Reading tests: \nFlesh Reading Ease: {0}, Flesh Kincaid: {1}, SMOG: {2}".format(
+        #    flesh_score,
+        #    flesh_kincaid_score,
+        #    smog_score
+        #))
 
-        text_pulp = 0
         text_pulp = self.s_norm(
             flesh_score/100.0,
             # Not working well
@@ -215,9 +218,6 @@ class Book(object):
             # 1.8 - (smog_score/10.0)
             sigmoid(smog_score/12.0)
         )
-
-        print("Text pulp: {0}, Author pulp: {1}, Genre pulp: {2}".format(text_pulp, author_pulp, genre_pulp))
-
 
         if text_pulp > .85:
             text_pulp = "VERY HIGH"
@@ -230,8 +230,10 @@ class Book(object):
         elif text_pulp <= .7:
             text_pulp = "VERY LOW"
 
-        # Fuzzy if-then rules:
+        # print("Text pulp: {0}, Author pulp: {1}, Genre pulp: {2}".format(text_pulp, author_pulp, genre_pulp))
 
+
+        # Fuzzy if-then rules:
         if author_pulp is "LOW" and genre_pulp is "LOW" and text_pulp in ("LOW", "VERY LOW"):
             self.pulp_value = "VERY LOW"
 
