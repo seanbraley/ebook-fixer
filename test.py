@@ -332,6 +332,9 @@ for paragraph in fileText:
 
 docSavageFirst = Book('Doc Savage - 001 The Man of Bronze', 'Keneth Robeson', 'mystery;adventure', sentences_complete)
 docSavageFirst.estimate_pulpiness_fuzzy()
+# docSavageFirst.format()
+
+
 
 '''
 print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),
@@ -406,6 +409,11 @@ para_lengths = [len(x) for x in moby_paras]
 
 theMobyDickBook = Book('Moby Dick', 'Melville', 'Adventure', nltk.corpus.gutenberg.sents('melville-moby_dick.txt'))
 theMobyDickBook.estimate_pulpiness_fuzzy()
+theMobyDickBook.format()
+import codecs
+
+with codecs.open('outputfile2.txt', 'w', 'utf-8') as output:
+    output.write(theMobyDickBook.corrected_text)
 
 '''
 print("Average Paragraph Length: {0:.2f} sentences; Max: {1:.2f}; Min {2:.2f}".format(average(para_lengths),

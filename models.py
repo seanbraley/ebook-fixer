@@ -3,6 +3,7 @@ __author__ = 'sean.braley'
 import re
 import math
 import nltk
+import progressbar
 
 from knowledge_base import genres_pulp, authors_pulp, transition_words, exclusion_words
 
@@ -43,13 +44,13 @@ class Book(object):
                 *args[1:]
             )
         # Goguen
-        return min(x, y)
+        # return min(x, y)
 
         # Zukasiewiez
         # return max(0, x+y-1)
 
         # Nilpotent
-        # return min(x, y) if (x + y > 1) else 0
+        return min(x, y) if (x + y > 1) else 0
 
     def s_norm(self, x, y, *args):
         if args:
@@ -59,13 +60,13 @@ class Book(object):
                 *args[1:]
             )
         # Goguen
-        # return max(x, y)
+        return max(x, y)
 
         # Zukasiewiez
         # return min(1, x+y)
 
         # Nilpotent
-        return max(x, y) if (x + y > 1) else 1
+        # return max(x, y) if (x + y > 1) else 1
 
     def format(self):
         if self.pulp_value is None:
@@ -87,8 +88,12 @@ class Book(object):
 
 
         """
-        subject = {}
-        for sentence in self.sentences:
+        subjects = []
+        values = []
+
+        bar = progressbar.ProgressBar(maxval=len(self.sentences), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
+        for i, sentence in enumerate(self.sentences):
+            bar.update(i+1)
             # Speaking (ALWAYS BREAK)
             is_speaking = 1.0 if re.match(speaking, sentence[0]) else 0
 
@@ -112,13 +117,46 @@ class Book(object):
 
             # Context check (Add this)
             # subject['subject'] = score
-            if subject[max(subject)] < 5:
-                context = .7
-            else:
+
+            # POS Tagging for sentence
+            sentence_tokenized = nltk.tokenize.word_tokenize(sentence.strip())
+            pos_tagged_sentence = nltk.pos_tag(sentence_tokenized)
+            # print("Sentence: {0}".format(sentence))
+
+            for word in pos_tagged_sentence:
+                if word[1] == 'NN':
+                    # print("Subject: {0}".format(word[0]))
+                    if len(subjects) == 0:
+                        subjects.append(word[0])
+                        values.append(1)
+                    elif len(subjects) == 1:
+                        if word[0] not in subjects:
+                            subjects = [subjects[0], word[0]]
+                            values = [.4, .3]
+                    elif len(subjects) == 2:
+                        if word[0] not in subjects:
+                            subjects = [subjects[0], subjects[1], word[0]]
+                            values = [.4, .3, .2]
+                    elif len(subjects) == 3:
+                        if word[0] not in subjects:
+                            subjects = [subjects[0], subjects[1], subjects[2], word[0]]
+                            values = [.4, .3, .2, .1]
+                    else:
+                        if word[0] not in subjects:
+                            values = [.3, ]
+
+            if values == []:
                 context = .3
-
+            elif len(values) == 1:
+                context = values[0]
+            else:
+                context = self.s_norm(*values)
+            # context = sigmoid(context)
+            # print("Context Value: {0}".format(sigmoid(context)))
             do_break = self.s_norm(is_speaking, keyword, context, sigmoid(length/5.0))
-
+            # print("Do Break: is_speaking: {0}, keyword: {1}, context: {2}, length: {3}, s_norm: {4}".format(
+            #     is_speaking, keyword, context, sigmoid(length/5.0), do_break
+            # ))
             conversion_dict = {
                 "VERY HIGH": 0.9,
                 "HIGH": 0.7,
@@ -128,19 +166,22 @@ class Book(object):
             }
 
             new_break = self.t_norm(do_break, conversion_dict[self.pulp_value])
-
+            # print("New Break: do_break: {0}, pulp_value: {1}, t_norm: {2}".format(
+            #     do_break, conversion_dict[self.pulp_value], new_break
+            # ))
             # print "Values: {0}, {1}, {2}".format(new_break, do_break, conversion_dict[self.pulp_value])
             # print new_break
             if new_break >= 0.5:
                 self.corrected_text += "\n\n"
-                subject = {}
-                length = 1
+                subjects = []
+                values = []
             else:
                 length += 1
 
             # Do line break before you add the sentence
-            self.corrected_text += sentence[0] + sentence[1]
+            self.corrected_text += sentence
             self.corrected_text += " "
+        bar.finish()
 
     def estimate_pulpiness_fuzzy(self):
         '''Sets the value for pulpiness based on the auther, genre and text content'''
