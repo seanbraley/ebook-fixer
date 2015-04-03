@@ -1,6 +1,6 @@
 __author__ = 'sean.braley'
 
-exclusion_words = [
+exclusion_words = (
     'Whose', 'What', "ever'", 'Whosever', 'thees', 'its', 'whose', 'His', 'enny', 'anye',
     'Both', 'them', 'his', 'whichever', 'every', 'thet', 'ther', 'Whatever', 'these',
     'hys', 'either', 'each', "another's", 'some', 'Which', 'our', 'Neither', 'out',
@@ -10,7 +10,7 @@ exclusion_words = [
     'Those', 'that', 'These', 'ani', 'those', 'hir', 'this', 'nether', 'Our', 'my',
     'Any', 'mine', 'an', 'myn', 'any', 'Them', 'no', 'Ye', 'which', "th'", 'A', 'Thy',
     'mah', 'The', 'myne', 'a', 'thy', 'Some', 'An', 'Another', 'the', 'Its', 'I'
-]
+)
 
 authors_pulp = {
     'high': [

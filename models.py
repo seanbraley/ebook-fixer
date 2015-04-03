@@ -15,6 +15,12 @@ def average(l):
     return reduce(lambda x, y: x + y, l) / float(len(l))
 
 
+# http://rosettacode.org/wiki/Map_range#Python
+def maprange(a, b, s):
+    (a1, a2), (b1, b2) = a, b
+    return b1 + ((s - a1) * (b2 - b1) / (a2 - a1))
+
+
 # http://stackoverflow.com/questions/3985619/how-to-calculate-a-logistic-sigmoid-function-in-python
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
@@ -30,6 +36,7 @@ class Book(object):
         self.sentences = sentences
         self.corrected_text = ""
         self.paragraphs = []
+        self.paragraph_temp = []
 
         # A value in the range [0..1]
         self.pulp_value = pulp_value
@@ -45,13 +52,13 @@ class Book(object):
                 *args[1:]
             )
         # Goguen
-        # return min(x, y)
+        return min(x, y)
 
         # Zukasiewiez
         # return max(0, x+y-1)
 
         # Nilpotent
-        return min(x, y) if (x + y > 1) else 0
+        # return min(x, y) if (x + y > 1) else 0
 
     def s_norm(self, x, y, *args):
         if args:
@@ -68,6 +75,18 @@ class Book(object):
 
         # Nilpotent
         # return max(x, y) if (x + y > 1) else 1
+
+    # Negate function
+    def n_(self, x):
+
+        # Basic
+        return 1 - x
+
+        # Squared
+        # return 1 - math.pow(x, 2)
+
+        # Square Root
+        # return 1 - math.sqrt(x)
 
     def format(self):
         if self.pulp_value is None:
@@ -103,8 +122,8 @@ class Book(object):
             is_speaking = 1.0 if re.match(speaking, sentence[0]) else 0
 
             # Keyword, sometimes break
-            if sentence[0].startswith(('A', 'The')):
-                keyword = .7
+            if sentence[0].startswith(('A ', 'The ')):
+                keyword = .5
             elif sentence[0].startswith(('Once', 'Later', 'This afternoon', 'Tonight', "Tomorrow", 'Soon', 'Afterwards')):
                 keyword = .7
             elif sentence[0].startswith(('Across', 'Over', 'Under', 'Behind', 'Around', 'Near')):
@@ -120,15 +139,31 @@ class Book(object):
             else:
                 keyword = 0.0
 
+            if sentence[0].startswith(exclusion_words):
+                exclusion = 0.0
+            else:
+                exclusion = 1.0
+
             # Context check (Add this)
             # subject['subject'] = score
 
             # POS Tagging for sentence
+
+            sen = []
+            try:
+                for s in sentence:
+                    s.encode('ascii', errors='ignore')
+                    sen.append(s)
+            except UnicodeDecodeError:
+                print("Non ascii character.. skipping it")
+                pass
+            sentence = sen
+
             pos_tagged_sentence = nltk.pos_tag(sentence)
             # print("Sentence: {0}".format(sentence))
 
             '''
-            This gives far too lenient answers
+            This gives far too lenient answers Not any more!
 
             '''
 
@@ -157,12 +192,12 @@ class Book(object):
             if values == []:
                 context = .3
             elif len(values) == 1:
-                context = values[0]
+                context = self.n_(values[0])
             else:
-                context = self.s_norm(*values)
+                context = self.n_(self.s_norm(*values))
             # context = sigmoid(context)
             # print("Context Value: {0}".format(sigmoid(context)))
-            do_break = self.s_norm(is_speaking, keyword, context, sigmoid(length/10.0))
+            do_break = self.s_norm(is_speaking, keyword, context, sigmoid(length/5.0))
             #print("Do Break: is_speaking: {0}, keyword: {1}, context: {2}, length: {3}, s_norm: {4}".format(
             #    is_speaking, keyword, context, sigmoid(length/100.0), do_break
             #))
@@ -174,7 +209,7 @@ class Book(object):
                 "VERY LOW": 0.1,
             }
 
-            new_break = self.t_norm(do_break, self.pulp_value)
+            new_break = self.t_norm(do_break, self.pulp_value, exclusion)
             # print("New Break: do_break: {0}, pulp_value: {1}, t_norm: {2}".format(
             #     do_break, conversion_dict[self.pulp_value], new_break
             # ))
@@ -182,18 +217,26 @@ class Book(object):
             # print new_break
             if new_break >= 0.7:
                 self.corrected_text += "\n\n"
+                self.paragraphs.append(" ".join(self.paragraph_temp))
+                self.corrected_text += self.paragraphs[-1]
+
+                # Reset
+                self.paragraph_temp = []
                 subjects = []
                 values = []
                 length = 0
             else:
+                # http://stackoverflow.com/questions/21948019/python-untokenize-a-sentence
+                self.paragraph_temp.append("".join(
+                    [" "+i if not i.startswith("'") and i not in string.punctuation else i for i in sentence]
+                ).strip())
                 length += 1
 
             # Do line break before you add the sentence
-            # http://stackoverflow.com/questions/21948019/python-untokenize-a-sentence
-            self.corrected_text += "".join([" "+i if not i.startswith("'") and i not in string.punctuation else i for i in sentence]).strip()
+
             # self.corrected_text += " ".join(sentence)
             # Space after sentence
-            self.corrected_text += " "
+            # self.corrected_text += " "
         bar.finish()
 
     def estimate_pulpiness_fuzzy(self):
@@ -278,7 +321,9 @@ class Book(object):
         else:
             meta = .7
 
-        self.pulp_value = (text_pulp)
+        # self.pulp_value = maprange((.3, .9), (0, 1), text_pulp)
+        self.pulp_value = text_pulp
+
 
         print("Pulp Value: {0:.2f}".format(self.pulp_value))
         '''
