@@ -1,5 +1,12 @@
 ## Project to heuristically fix ebook
 
+### INSTALL NOTES:
+#### Requires:
+* numpy
+* nltk
+* progressbar
+
+
 ### Notes:
 * Consider using fuzzy logic for the paragraph breaks, with a fuzzy break-level-input
 * Will eventually migrating this to a Calibre plugin (Thus keeping external libraries to a minimum)

@@ -94,23 +94,12 @@ class Book(object):
 
         # Textual Indicators
         speaking = r'\"(.+?)\"'
-        # sentence = r'(.+?)(\.\s|\!\s|\?\s|\.\"\s|\?\"\s)'
-        # sentences = re.findall(sentence, self.text)
 
         length = 1
-
-        """
-        Some thoughtspace here...
-
-        In the below code what is really happening is only one of these will ever match bcs its really a giant case statement
-
-        NEED TO FUZZY TRACK CHANGES IN PERSPECTIVE. KEYWORDS ARE NOT ENOUGH
-
-
-        """
         subjects = []
         values = []
 
+        # Visual indicator of progress
         bar = progressbar.ProgressBar(maxval=len(self.sentences), widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
         for i, sentence in enumerate(self.sentences):
             bar.update(i+1)
@@ -144,11 +133,7 @@ class Book(object):
             else:
                 exclusion = 1.0
 
-            # Context check (Add this)
-            # subject['subject'] = score
-
             # POS Tagging for sentence
-
             sen = []
             try:
                 for s in sentence:
@@ -160,16 +145,9 @@ class Book(object):
             sentence = sen
 
             pos_tagged_sentence = nltk.pos_tag(sentence)
-            # print("Sentence: {0}".format(sentence))
-
-            '''
-            This gives far too lenient answers Not any more!
-
-            '''
 
             for word in pos_tagged_sentence:
-                if word[1] == 'NN':
-                    # print("Subject: {0}".format(word[0]))
+                if word[1] == 'NN':  # If word is a noun
                     if len(subjects) == 0:
                         subjects.append(word[0])
                         values.append(1)
@@ -195,12 +173,11 @@ class Book(object):
                 context = self.n_(values[0])
             else:
                 context = self.n_(self.s_norm(*values))
-            # context = sigmoid(context)
-            # print("Context Value: {0}".format(sigmoid(context)))
+
+            # S Norm, sigmoid length to contain it
             do_break = self.s_norm(is_speaking, keyword, context, sigmoid(length/5.0))
-            #print("Do Break: is_speaking: {0}, keyword: {1}, context: {2}, length: {3}, s_norm: {4}".format(
-            #    is_speaking, keyword, context, sigmoid(length/100.0), do_break
-            #))
+
+            # No longer used
             conversion_dict = {
                 "VERY HIGH": 0.9,
                 "HIGH": 0.7,
@@ -210,14 +187,13 @@ class Book(object):
             }
 
             new_break = self.t_norm(do_break, self.pulp_value, exclusion)
-            # print("New Break: do_break: {0}, pulp_value: {1}, t_norm: {2}".format(
-            #     do_break, conversion_dict[self.pulp_value], new_break
-            # ))
-            # print "Values: {0}, {1}, {2}".format(new_break, do_break, conversion_dict[self.pulp_value])
-            # print new_break
+
             if new_break >= 0.7:
+                # Formatting
                 self.corrected_text += "\n\n"
+                # Join sentences
                 self.paragraphs.append(" ".join(self.paragraph_temp))
+                # Add paragraph to text
                 self.corrected_text += self.paragraphs[-1]
 
                 # Reset
@@ -225,24 +201,21 @@ class Book(object):
                 subjects = []
                 values = []
                 length = 0
-            else:
+            else:  # Add sentences to paragraph
                 # http://stackoverflow.com/questions/21948019/python-untokenize-a-sentence
                 self.paragraph_temp.append("".join(
                     [" "+i if not i.startswith("'") and i not in string.punctuation else i for i in sentence]
                 ).strip())
                 length += 1
 
-            # Do line break before you add the sentence
-
-            # self.corrected_text += " ".join(sentence)
-            # Space after sentence
             # self.corrected_text += " "
         bar.finish()
 
     def estimate_pulpiness_fuzzy(self):
         '''Sets the value for pulpiness based on the auther, genre and text content'''
-        author_pulp = "HIGH" if self.author in authors_pulp['high'] else "LOW"
 
+        # These are no longer used
+        author_pulp = "HIGH" if self.author in authors_pulp['high'] else "LOW"
         genre_pulp = "HIGH" if self.genre in genres_pulp['high'] else "LOW"
 
         # Analyze text
@@ -271,8 +244,6 @@ class Book(object):
         # Calculate averages
 
         # Shortwords Percentage
-        # print("shortwords: {0}, len(word_lengths): {1}, exception_words: {2}".format(shortwords, len(word_lengths), exception_words))
-
         shortwords_percentage = float(shortwords)/float(len(word_lengths)-exception_words)
 
         # Average word length
@@ -297,16 +268,19 @@ class Book(object):
 
         smog_score = 1.0430 * math.sqrt(number_polysyllables * (30/float(len(sentence_lengths)))) + 3.1291
 
-        #print("Stats: \nShortwords Percentage: {0:.2f}%; Average Word Length: {1:.2f} letters; "
-        #      "Average Sentence Length: {2:.2f} words; average syllable length: {3:.2f}"
-        #      .format(shortwords_percentage*100, average_word_length,
-        #              average_sentence_length, average_sylco_length))
+        # Enable for stats on the books:
+        '''
+        print("Stats: \nShortwords Percentage: {0:.2f}%; Average Word Length: {1:.2f} letters; "
+              "Average Sentence Length: {2:.2f} words; average syllable length: {3:.2f}"
+              .format(shortwords_percentage*100, average_word_length,
+                      average_sentence_length, average_sylco_length))
 
-        #print("Reading tests: \nFlesh Reading Ease: {0}, Flesh Kincaid: {1}, SMOG: {2}".format(
-        #    flesh_score,
-        #    flesh_kincaid_score,
-        #    smog_score
-        #))
+        print("Reading tests: \nFlesh Reading Ease: {0}, Flesh Kincaid: {1}, SMOG: {2}".format(
+            flesh_score,
+            flesh_kincaid_score,
+            smog_score
+        ))
+        '''
 
         text_pulp = self.s_norm(
             flesh_score/100.0,
@@ -316,16 +290,19 @@ class Book(object):
             sigmoid(smog_score/12.0)
         )
 
+        # No longer used
         if author_pulp is "LOW" and genre_pulp is "LOW":
             meta = .4
         else:
             meta = .7
 
+        # Map range .6-.9 did not work well
         # self.pulp_value = maprange((.3, .9), (0, 1), text_pulp)
         self.pulp_value = text_pulp
 
-
         print("Pulp Value: {0:.2f}".format(self.pulp_value))
+
+        # Disabled because fidelity, explained in paper
         '''
         if text_pulp > .85:
             text_pulp = "VERY HIGH"
