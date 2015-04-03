@@ -3,6 +3,7 @@ __author__ = 'sean.braley'
 import re
 import math
 import nltk
+import string
 import progressbar
 
 from knowledge_base import genres_pulp, authors_pulp, transition_words, exclusion_words
@@ -95,6 +96,10 @@ class Book(object):
         for i, sentence in enumerate(self.sentences):
             bar.update(i+1)
             # Speaking (ALWAYS BREAK)
+            if type(sentence) is str:
+                sentence = nltk.tokenize.word_tokenize(sentence)
+
+
             is_speaking = 1.0 if re.match(speaking, sentence[0]) else 0
 
             # Keyword, sometimes break
@@ -119,9 +124,13 @@ class Book(object):
             # subject['subject'] = score
 
             # POS Tagging for sentence
-            sentence_tokenized = nltk.tokenize.word_tokenize(sentence.strip())
-            pos_tagged_sentence = nltk.pos_tag(sentence_tokenized)
+            pos_tagged_sentence = nltk.pos_tag(sentence)
             # print("Sentence: {0}".format(sentence))
+
+            '''
+            This gives far too lenient answers
+
+            '''
 
             for word in pos_tagged_sentence:
                 if word[1] == 'NN':
@@ -153,10 +162,10 @@ class Book(object):
                 context = self.s_norm(*values)
             # context = sigmoid(context)
             # print("Context Value: {0}".format(sigmoid(context)))
-            do_break = self.s_norm(is_speaking, keyword, context, sigmoid(length/5.0))
-            # print("Do Break: is_speaking: {0}, keyword: {1}, context: {2}, length: {3}, s_norm: {4}".format(
-            #     is_speaking, keyword, context, sigmoid(length/5.0), do_break
-            # ))
+            do_break = self.s_norm(is_speaking, keyword, context, sigmoid(length/10.0))
+            #print("Do Break: is_speaking: {0}, keyword: {1}, context: {2}, length: {3}, s_norm: {4}".format(
+            #    is_speaking, keyword, context, sigmoid(length/100.0), do_break
+            #))
             conversion_dict = {
                 "VERY HIGH": 0.9,
                 "HIGH": 0.7,
@@ -165,21 +174,25 @@ class Book(object):
                 "VERY LOW": 0.1,
             }
 
-            new_break = self.t_norm(do_break, conversion_dict[self.pulp_value])
+            new_break = self.t_norm(do_break, self.pulp_value)
             # print("New Break: do_break: {0}, pulp_value: {1}, t_norm: {2}".format(
             #     do_break, conversion_dict[self.pulp_value], new_break
             # ))
             # print "Values: {0}, {1}, {2}".format(new_break, do_break, conversion_dict[self.pulp_value])
             # print new_break
-            if new_break >= 0.5:
+            if new_break >= 0.7:
                 self.corrected_text += "\n\n"
                 subjects = []
                 values = []
+                length = 0
             else:
                 length += 1
 
             # Do line break before you add the sentence
-            self.corrected_text += sentence
+            # http://stackoverflow.com/questions/21948019/python-untokenize-a-sentence
+            self.corrected_text += "".join([" "+i if not i.startswith("'") and i not in string.punctuation else i for i in sentence]).strip()
+            # self.corrected_text += " ".join(sentence)
+            # Space after sentence
             self.corrected_text += " "
         bar.finish()
 
@@ -260,6 +273,15 @@ class Book(object):
             sigmoid(smog_score/12.0)
         )
 
+        if author_pulp is "LOW" and genre_pulp is "LOW":
+            meta = .4
+        else:
+            meta = .7
+
+        self.pulp_value = (text_pulp)
+
+        print("Pulp Value: {0:.2f}".format(self.pulp_value))
+        '''
         if text_pulp > .85:
             text_pulp = "VERY HIGH"
         elif .8 < text_pulp <= .85:
@@ -319,3 +341,4 @@ class Book(object):
                                                                                           text_pulp)
 
         print("Discovered pulp value: {0}".format(self.pulp_value))
+        '''

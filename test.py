@@ -311,6 +311,7 @@ print("\nShadow: ")
 theShadowBook = Book('The Shadow', 'Walter B. Gibson', 'Mystery;Adventure', sent_detector.tokenize(text.strip()))
 theShadowBook.estimate_pulpiness_fuzzy()
 
+
 # Keneth Robeson book:
 print("\nDoc Savage: ")
 
@@ -332,7 +333,11 @@ for paragraph in fileText:
 
 docSavageFirst = Book('Doc Savage - 001 The Man of Bronze', 'Keneth Robeson', 'mystery;adventure', sentences_complete)
 docSavageFirst.estimate_pulpiness_fuzzy()
-# docSavageFirst.format()
+docSavageFirst.format()
+import codecs
+
+with codecs.open('outputfile.txt', 'w', 'utf-8') as output:
+    output.write(docSavageFirst.corrected_text)
 
 
 
@@ -410,7 +415,6 @@ para_lengths = [len(x) for x in moby_paras]
 theMobyDickBook = Book('Moby Dick', 'Melville', 'Adventure', nltk.corpus.gutenberg.sents('melville-moby_dick.txt'))
 theMobyDickBook.estimate_pulpiness_fuzzy()
 theMobyDickBook.format()
-import codecs
 
 with codecs.open('outputfile2.txt', 'w', 'utf-8') as output:
     output.write(theMobyDickBook.corrected_text)
@@ -466,7 +470,7 @@ moby_dick = nltk.corpus.gutenberg.raw('melville-moby_dick.txt')
 
 import codecs
 
-with codecs.open('outputfile2.txt', 'w', 'utf-8') as output:
+with codecs.open('outputfile.txt', 'w', 'utf-8') as output:
     output.write(moby_dick)
 
 moby_dick_stripped_text = moby_dick.replace("\n", "")
